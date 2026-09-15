@@ -34,7 +34,7 @@ my-newsletter/
 ├── store/metrics.jsonl         # 실행마다 한 줄씩 쌓이는 지표 기록
 ├── requirements.txt            # 의존성 패키지 목록
 ├── tests/                      # pytest 유닛 테스트 (설정 로딩, 발행 텍스트 조립, 날짜 처리, 최소건수 보충)
-├── .github/workflows/daily.yml # 매일 KST 07:30 자동 실행 + 지표 커밋
+├── .github/workflows/daily.yml # 매일 KST 08:00 자동 실행 + 지표 커밋
 └── REPORT.md                   # 소스 채택표·선별 로직·회고 등 프로젝트 보고서
 ```
 
