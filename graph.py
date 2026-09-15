@@ -27,10 +27,11 @@ class Brief(TypedDict):
 
 UA = {"User-Agent": "Mozilla/5.0 (newsletter-agent-course)"}
 SOURCES = [
-    ("베리타스알파",  "https://www.veritas-a.com/rss/allArticle.xml"),
-    ("에듀동아",      "https://edu.donga.com/rss/allArticle.xml"),
-    ("한국대학신문",  "https://news.unn.net/rss/allArticle.xml"),
-    ("KEDI",          "https://www.kedi.re.kr/khome/main/announce/rssAnnounceData.do?board_sq_no=3"),
+    ("베리타스알파",    "https://www.veritas-a.com/rss/allArticle.xml"),
+    ("에듀동아",        "https://edu.donga.com/rss/allArticle.xml"),
+    ("한국대학신문",    "https://news.unn.net/rss/allArticle.xml"),
+    ("KEDI",            "https://www.kedi.re.kr/khome/main/announce/rssAnnounceData.do?board_sq_no=3"),
+    ("서울시교육청",    "https://enews.sen.go.kr/rss.do"),
 ]
 
 
@@ -38,9 +39,21 @@ def strip_tags(s):
     return re.sub(r"<[^>]+>", "", s or "").strip()
 
 
+KST = timezone(timedelta(hours=9))
+
 def published_at(entry):
     t = entry.get("published_parsed")
-    return datetime(*t[:6], tzinfo=timezone.utc) if t else None
+    if not t:
+        return None
+    dt = datetime(*t[:6])
+    raw = (entry.get("published") or "").strip()
+    # 시각 없이 날짜만 있는 pubDate(예: "2026-09-14")는 feedparser가 자정으로 채운다.
+    # 하루 중 언제 올라왔을지 알 수 없으므로, 한국 시간 기준 "그날이 끝나는 시각"으로
+    # 잡아야 컷오프 경계에서 부당하게 제외되지 않는다 (자정으로 잡으면 오히려 더 과거로 밀림).
+    date_only = len(raw) <= 10 and dt.hour == dt.minute == dt.second == 0
+    if date_only:
+        return dt.replace(hour=23, minute=59, second=59, tzinfo=KST)
+    return dt.replace(tzinfo=timezone.utc)
 
 
 def collect(s: dict) -> dict:   # ① 자료 수집 — 빈 노드를 갈아 끼운다
