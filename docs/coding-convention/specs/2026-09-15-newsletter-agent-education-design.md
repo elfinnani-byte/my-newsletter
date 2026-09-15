@@ -22,7 +22,7 @@
 
 | 소스 | URL | 확인 결과 |
 |---|---|---|
-| 베리타스알파 · 대입 섹션 | `https://www.veritas-a.com/rss/S1N2.xml` | HTTP 200, `application/xml`, 당일 기사 확인 (2026-09-15) |
+| 베리타스알파 · 전체기사 | `https://www.veritas-a.com/rss/allArticle.xml` | HTTP 200, `application/xml`. 대입 섹션 전용(`S1N2.xml`)에서 전체기사로 최종 변경 — 대입 외 뉴스도 커버하되, 업무협약 등 무관 기사는 ②선별의 "버릴 것" 기준으로 걸러짐을 실행으로 확인 |
 | 에듀동아 | `https://edu.donga.com/rss/allArticle.xml` | HTTP 200, `application/xml` |
 | 한국대학신문(UNN) | `https://news.unn.net/rss/allArticle.xml` | HTTP 200, `application/xml` |
 | 한국교육개발원(KEDI) 보도자료 | `https://www.kedi.re.kr/khome/main/announce/rssAnnounceData.do?board_sq_no=3` | HTTP 200, `text/xml`. 내용 확인: "2026년 교육기본통계 조사 결과 발표", "N수생의 특성 분석: 입시 결과 및 대학 경험" 등 — 교육부 산하 국책연구기관의 정책·통계 보도자료로, 공식 발표에 가장 근접한 실제 작동 소스 |

@@ -10,7 +10,7 @@
 
 | 소스 | URL | 상태 | 채택 여부 | 근거 |
 |---|---|---|---|---|
-| 베리타스알파 · 대입 섹션 | `https://www.veritas-a.com/rss/S1N2.xml` | HTTP 200 | 채택 | 표준 RSS 2.0, 대입 섹션 전용 피드로 관련성 높음 |
+| 베리타스알파 · 전체기사 | `https://www.veritas-a.com/rss/allArticle.xml` | HTTP 200 | 채택 | 표준 RSS 2.0. 대입 섹션 전용(`S1N2.xml`)도 검토했으나, 대입 외 전체 뉴스도 놓치지 않도록 전체기사 피드로 최종 결정. 업무협약 등 무관 기사가 섞여 들어오지만 ②선별의 "버릴 것" 기준으로 정상적으로 걸러짐을 실행으로 확인 |
 | 에듀동아 | `https://edu.donga.com/rss/allArticle.xml` | HTTP 200 | 채택 | 표준 RSS 2.0 |
 | 한국대학신문(UNN) | `https://news.unn.net/rss/allArticle.xml` | HTTP 200 | 채택 | 표준 RSS 2.0, 대학 소식 전문지 |
 | 한국교육개발원(KEDI) 보도자료 | `https://www.kedi.re.kr/khome/main/announce/rssAnnounceData.do?board_sq_no=3` | HTTP 200 | 채택 | 교육부 산하 국책연구기관의 정책·통계 발표. 공식 발표에 가장 근접한 실사용 가능 소스 |
