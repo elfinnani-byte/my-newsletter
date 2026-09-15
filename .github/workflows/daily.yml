@@ -30,8 +30,8 @@ jobs:
       - name: 브리핑 생성·발행
         run: python run.py ${{ inputs.dry_run && '--dry-run' || '' }}
         env:
-          OPENAI_API_KEY:      ${{ secrets.OPENAI_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          OPENAI_API_KEY:    ${{ secrets.OPENAI_API_KEY }}
+          GCHAT_WEBHOOK_URL: ${{ secrets.GCHAT_WEBHOOK_URL }}
           TZ: Asia/Seoul
 
       - name: 기록 커밋
