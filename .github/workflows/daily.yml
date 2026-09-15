@@ -1,4 +1,5 @@
 name: 매일 브리핑
+# GitHub Actions 워크플로 재동기화 트리거용 주석
 
 permissions:
   contents: write
