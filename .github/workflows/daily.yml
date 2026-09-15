@@ -5,7 +5,7 @@ permissions:
 
 on:
   schedule:
-    - cron: "30 22 * * *"       # UTC 22:30 = KST 07:30
+    - cron: "0 23 * * *"        # UTC 23:00 = KST 08:00
   workflow_dispatch:
     inputs:
       dry_run:
