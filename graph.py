@@ -119,23 +119,28 @@ def ask_picks(items, n):
 
 def select(s: dict) -> dict:                   # ② 중요도 선별 — 빈 노드를 갈아 끼운다
     items = s["collected"]
-    survivors = []
+    survivors, prelim_log = [], []
     for i in range(0, len(items), BATCH):       # 예선 — 묶음마다 여덟 건
         chunk = items[i:i + BATCH]
-        survivors += [chunk[p.index] for p in ask_picks(chunk, 8)]
+        picks = ask_picks(chunk, 8)
+        survivors += [chunk[p.index] for p in picks]
+        prelim_log += [f"   예선 통과 [{chunk[p.index]['source']}] "
+                        f"{chunk[p.index]['title'][:30]} · {p.reason}" for p in picks]
     finals = ask_picks(survivors, TARGET)       # 본선 — 한 화면에 놓고 다섯 건
 
-    picked, seen_events, dupes = [], set(), 0
+    picked, seen_events, dupes, final_log = [], set(), 0, []
     for p in finals:
+        it = survivors[p.index]
         if p.event in seen_events:
             dupes += 1
             continue
         seen_events.add(p.event)
-        picked.append({**survivors[p.index], "event": p.event})
+        picked.append({**it, "event": p.event, "pick_reason": p.reason})
+        final_log.append(f"   본선 채택 [{it['source']}] {it['title'][:30]} · {p.reason}")
 
-    return {"picked": picked,
-            "log": [f"② 선별   {len(items)} → 예선 {len(survivors)} → {len(finals)}건"
-                    + (f" · 중복사건 제외 {dupes}건" if dupes else "")]}
+    log = [f"② 선별   {len(items)} → 예선 {len(survivors)} → {len(finals)}건"
+           + (f" · 중복사건 제외 {dupes}건" if dupes else "")]
+    return {"picked": picked, "log": log + prelim_log + final_log}
 
 class Draft(BaseModel):        # 섹션에서 정한 세 칸 + 주제 분류
     headline: str = Field(description="20자 내외의 한국어 헤드라인")
