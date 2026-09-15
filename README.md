@@ -25,16 +25,17 @@ graph LR
 ## 파일 구조
 
 ```
-graph.py                # LangGraph 파이프라인 (5개 노드)
-config.py                # audience.yaml 로딩 및 프롬프트 조립
-audience.yaml             # 독자·중요도 기준·버릴 것·토픽 설정 (분야별로 이 파일만 갈아 끼우면 됨)
-run.py                    # 실행 스크립트
-metrics_report.py         # 소스별 발행 기여 성적표
-store/metrics.jsonl       # 실행마다 한 줄씩 쌓이는 지표 기록
-requirements.txt
-tests/                    # pytest 유닛 테스트 (설정 로딩, 발행 텍스트 조립, 날짜 처리, 최소건수 보충)
-.github/workflows/daily.yml   # 매일 KST 07:30 자동 실행 + 지표 커밋
-REPORT.md                 # 소스 채택표·선별 로직·회고 등 프로젝트 보고서
+my-newsletter/
+├── graph.py                    # LangGraph 파이프라인 (5개 노드)
+├── config.py                   # audience.yaml 로딩 및 프롬프트 조립
+├── audience.yaml               # 독자·중요도 기준·버릴 것·토픽 설정 (분야별로 이 파일만 갈아 끼우면 됨)
+├── run.py                      # 실행 스크립트
+├── metrics_report.py           # 소스별 발행 기여 성적표
+├── store/metrics.jsonl         # 실행마다 한 줄씩 쌓이는 지표 기록
+├── requirements.txt            # 의존성 패키지 목록
+├── tests/                      # pytest 유닛 테스트 (설정 로딩, 발행 텍스트 조립, 날짜 처리, 최소건수 보충)
+├── .github/workflows/daily.yml # 매일 KST 07:30 자동 실행 + 지표 커밋
+└── REPORT.md                   # 소스 채택표·선별 로직·회고 등 프로젝트 보고서
 ```
 
 ## 실행하기
