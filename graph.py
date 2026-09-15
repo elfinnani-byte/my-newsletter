@@ -27,6 +27,7 @@ class Brief(TypedDict):
 
 UA = {"User-Agent": "Mozilla/5.0 (newsletter-agent-course)"}
 SOURCES = [
+    ("베리타스알파",    "https://www.veritas-a.com/rss/S1N2.xml"),
     ("베리타스알파",    "https://www.veritas-a.com/rss/allArticle.xml"),
     ("에듀동아",        "https://edu.donga.com/rss/allArticle.xml"),
     ("한국대학신문",    "https://news.unn.net/rss/allArticle.xml"),

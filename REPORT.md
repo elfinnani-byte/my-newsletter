@@ -10,7 +10,7 @@
 
 | 소스 | URL | 상태 | 채택 여부 | 근거 |
 |---|---|---|---|---|
-| 베리타스알파 · 전체기사 | `https://www.veritas-a.com/rss/allArticle.xml` | HTTP 200 | 채택 | 표준 RSS 2.0. 대입 섹션 전용(`S1N2.xml`)도 검토했으나, 대입 외 전체 뉴스도 놓치지 않도록 전체기사 피드로 최종 결정. 업무협약 등 무관 기사가 섞여 들어오지만 ②선별의 "버릴 것" 기준으로 정상적으로 걸러짐을 실행으로 확인 |
+| 베리타스알파 · 대입 섹션 + 전체기사 (2개 피드) | `https://www.veritas-a.com/rss/S1N2.xml`, `https://www.veritas-a.com/rss/allArticle.xml` | HTTP 200 (둘 다) | 채택 | 처음엔 전체기사만 썼다가, 전체기사는 RSS가 최신 50건만 유지해서 대입과 무관한 기사가 많이 올라오면 관련 기사가 목록에서 금방 밀려나는 문제를 실행 중 발견(같은 기사가 시간이 지나자 피드에서 사라짐). 대입 섹션(더 적게 갱신되어 안 밀림) + 전체기사(더 넓은 커버리지)를 둘 다 수집하도록 변경. URL 기준 중복 제거로 같은 기사가 두 번 잡히지 않음을 확인 |
 | 에듀동아 | `https://edu.donga.com/rss/allArticle.xml` | HTTP 200 | 채택 | 표준 RSS 2.0 |
 | 한국대학신문(UNN) | `https://news.unn.net/rss/allArticle.xml` | HTTP 200 | 채택 | 표준 RSS 2.0, 대학 소식 전문지 |
 | 한국교육개발원(KEDI) 보도자료 | `https://www.kedi.re.kr/khome/main/announce/rssAnnounceData.do?board_sq_no=3` | HTTP 200 | 채택 | 교육부 산하 국책연구기관의 정책·통계 발표. 공식 발표에 가장 근접한 실사용 가능 소스 |
@@ -25,7 +25,7 @@
 | KOSIS 최근수록자료 | `kosis.kr/rss/themes_rss.jsp` | HTTP 200 | 탈락 | 전국 전분야 통계가 섞여 노이즈가 큼 (교육 카테고리 미필터) |
 | 커리어넷 드림레터 | `career.go.kr/.../dreamLetter.rss` | HTTP 500 | 탈락 | URL이 깨져 있음 |
 
-최종 채택: 5개 소스 (베리타스알파, 에듀동아, 한국대학신문, KEDI 보도자료, 서울특별시교육청).
+최종 채택: 5개 기관·매체 (베리타스알파, 에듀동아, 한국대학신문, KEDI 보도자료, 서울특별시교육청), 총 6개 RSS 피드 (베리타스알파만 대입 섹션+전체기사 2개 피드).
 
 ## 3. 선별 로직 설계
 
