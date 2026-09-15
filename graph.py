@@ -102,6 +102,7 @@ class Shortlist(BaseModel):
     picks: list[Pick]
 
 BATCH, TARGET = 40, 5          # 예선 묶음 크기, 최종 발행 건수
+MIN_TARGET = 3                 # 최소 발행 건수 — 프로젝트 요구사항(3~5건)의 하한을 코드로 보장
 
 CRITERIA = build_criteria(CFG)
 
@@ -115,6 +116,23 @@ def ask_picks(items, n):
                   {"role": "user", "content": listing}],
         response_format=Shortlist).choices[0].message.parsed
     return [p for p in out.picks if 0 <= p.index < len(items)]      # 없는 번호는 버린다
+
+
+def backfill_minimum(picked, survivors, min_target):
+    """본선 결과가 min_target 미만이면 예선 통과작(survivors) 중 아직 안 뽑힌 것을
+    순서대로 채운다. survivors 자체가 min_target보다 적으면 있는 만큼만 채운다 —
+    없는 기사를 억지로 만들어내지는 않는다."""
+    picked_urls = {p["url"] for p in picked}
+    filled = list(picked)
+    for it in survivors:
+        if len(filled) >= min_target:
+            break
+        if it["url"] in picked_urls:
+            continue
+        filled.append({**it, "event": it["title"],
+                        "pick_reason": "최소 발행 건수를 채우기 위해 예선 통과작 중 추가 포함"})
+        picked_urls.add(it["url"])
+    return filled
 
 
 def select(s: dict) -> dict:                   # ② 중요도 선별 — 빈 노드를 갈아 끼운다
@@ -138,9 +156,15 @@ def select(s: dict) -> dict:                   # ② 중요도 선별 — 빈 �
         picked.append({**it, "event": p.event, "pick_reason": p.reason})
         final_log.append(f"   본선 채택 [{it['source']}] {it['title'][:30]} · {p.reason}")
 
+    before_backfill = len(picked)
+    picked = backfill_minimum(picked, survivors, MIN_TARGET)
+    backfill_log = [f"   최소건수 보충 [{p['source']}] {p['title'][:30]}"
+                     for p in picked[before_backfill:]]
+
     log = [f"② 선별   {len(items)} → 예선 {len(survivors)} → {len(finals)}건"
-           + (f" · 중복사건 제외 {dupes}건" if dupes else "")]
-    return {"picked": picked, "log": log + prelim_log + final_log}
+           + (f" · 중복사건 제외 {dupes}건" if dupes else "")
+           + (f" · 최소건수 보충 {len(picked) - before_backfill}건" if len(picked) > before_backfill else "")]
+    return {"picked": picked, "log": log + prelim_log + final_log + backfill_log}
 
 class Draft(BaseModel):        # 섹션에서 정한 세 칸 + 주제 분류
     headline: str = Field(description="20자 내외의 한국어 헤드라인")

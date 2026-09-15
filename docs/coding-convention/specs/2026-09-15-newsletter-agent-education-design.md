@@ -49,7 +49,7 @@
 
 ## 4. 자료 선별 — 기준
 
-기존 `select()`의 예선(BATCH=40)/본선(TARGET) 2단계 구조, `Pick`/`Shortlist` 스키마는 그대로 재사용한다. `CRITERIA` 문자열만 교체한다.
+기존 `select()`의 예선(BATCH=40)/본선(TARGET) 2단계 구조, `Pick`/`Shortlist` 스키마는 그대로 재사용한다. `CRITERIA` 문자열만 교체한다. 다만 과제 요구사항("3~5건")과 달리 원래 코드는 본선 상한(TARGET=5)만 있고 하한이 없어서, 실제로 1~2건만 나오는 경우를 실행 중 발견했다 — `backfill_minimum()`을 추가해 `MIN_TARGET`(3) 미만이면 예선 통과작 중 남은 것으로 코드 레벨에서 채운다 (자세한 내용은 REPORT.md §3).
 
 **중요도 기준** (예/아니오로 답할 수 있는 문장, 위에 있을수록 우선):
 1. 신학년도 입시 일정·제도가 새로 발표되었는가 (수시·정시 일정, 전형 신설·폐지)
@@ -146,7 +146,7 @@
 ```mermaid
 graph LR
   START --> collect["① collect\n(RSS 10개 피드, 6개 기관)"]
-  collect --> select["② select\n(예선 8건→본선 5건)"]
+  collect --> select["② select\n(예선 8건→본선 최소3~최대5건)"]
   select -->|Send fan-out| report["③ report\n(기사별 병렬 워커)"]
   report --> verify["④ verify\n(원문 대비 근거 확인)"]
   verify --> publish["⑤ publish\n(Google Chat webhook)"]
