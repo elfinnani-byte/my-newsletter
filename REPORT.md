@@ -12,6 +12,7 @@
 |---|---|---|---|---|
 | 베리타스알파 · 대입/대학/고입/고교/교육 섹션 (5개 피드) | `veritas-a.com/rss/S1N2~S1N6.xml` | HTTP 200 (전부) | 채택 | 처음엔 전체기사(`allArticle.xml`)를 썼다가, RSS가 최신 50건만 유지해서 대입과 무관한 기사가 많이 올라오면 관련 기사가 목록에서 금방 밀려나는 문제를 실행 중 발견. 사이트 실제 내비게이션(`sc_section_code`)을 확인해 관련 섹션(대입·대학·고입·고교·교육)만 골라 개별 수집하는 방식으로 전환 — 입학사정관은 지원자의 출신 고교 특성도 파악해야 하므로 고입·고교 섹션도 포함. 오피니언·도서·취업·문화·포토·구독자 섹션은 관련성 낮아 제외. 하위 섹션(수시·정시·교육정책 등)은 RSS 미제공(404)이라 상위 섹션 단위로만 수집. URL 기준 중복 제거로 같은 기사가 여러 섹션에 걸쳐도 한 번만 집계됨 |
 | 에듀동아 | `https://edu.donga.com/rss/allArticle.xml` | HTTP 200 | 채택 | 표준 RSS 2.0 |
+| 에듀진 | `https://www.edujin.co.kr/rss/allArticle.xml` | HTTP 200 | 채택 | 입시 전문지라 전체기사 자체가 학생부종합전형·논술·수시 등 입시 콘텐츠 위주로, 다른 매체의 전체기사 피드보다 노이즈가 적음. 섹션별 피드(`S1N3`=쏙쏙입시, `S1N15`=초중고대학)는 같은 CMS 벤더(ND소프트)의 타사 데모 데이터가 섞이거나 403 에러가 나서 미채택, 전체기사만 사용 |
 | 한국대학신문(UNN) | `https://news.unn.net/rss/allArticle.xml` | HTTP 200 | 채택 | 표준 RSS 2.0, 대학 소식 전문지 |
 | 한국교육개발원(KEDI) 보도자료 | `https://www.kedi.re.kr/khome/main/announce/rssAnnounceData.do?board_sq_no=3` | HTTP 200 | 채택 | 교육부 산하 국책연구기관의 정책·통계 발표. 공식 발표에 가장 근접한 실사용 가능 소스 |
 | 서울특별시교육청 | `https://enews.sen.go.kr/rss.do` | HTTP 200 | 채택 | 16개 시도교육청 중 유일하게 확인된 공식 RSS(전체기사, 42,626건 누적). 날짜만 있고 시각이 없는 `pubDate` 형식이라 수집 로직에 KST 보정을 추가함(§3 참고) |
@@ -25,7 +26,7 @@
 | KOSIS 최근수록자료 | `kosis.kr/rss/themes_rss.jsp` | HTTP 200 | 탈락 | 전국 전분야 통계가 섞여 노이즈가 큼 (교육 카테고리 미필터) |
 | 커리어넷 드림레터 | `career.go.kr/.../dreamLetter.rss` | HTTP 500 | 탈락 | URL이 깨져 있음 |
 
-최종 채택: 5개 기관·매체 (베리타스알파, 에듀동아, 한국대학신문, KEDI 보도자료, 서울특별시교육청), 총 9개 RSS 피드 (베리타스알파만 대입·대학·고입·고교·교육 5개 섹션 피드).
+최종 채택: 6개 기관·매체 (베리타스알파, 에듀동아, 에듀진, 한국대학신문, KEDI 보도자료, 서울특별시교육청), 총 10개 RSS 피드 (베리타스알파만 대입·대학·고입·고교·교육 5개 섹션 피드).
 
 ## 3. 선별 로직 설계
 
@@ -49,7 +50,7 @@
 
 ```mermaid
 graph LR
-  START --> collect["① collect\n(RSS 9개 피드, 5개 기관)"]
+  START --> collect["① collect\n(RSS 10개 피드, 6개 기관)"]
   collect --> select["② select\n(예선 8건→본선 5건)"]
   select -->|Send fan-out| report["③ report\n(기사별 병렬 워커)"]
   report --> verify["④ verify\n(원문 대비 근거 확인)"]

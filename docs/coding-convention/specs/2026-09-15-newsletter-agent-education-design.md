@@ -18,12 +18,13 @@
 
 ## 3. 자료 수집 — 소스
 
-### 3.1 채택 소스 (5개 기관·매체, 9개 RSS 피드, 연결 상태 직접 확인 완료)
+### 3.1 채택 소스 (6개 기관·매체, 10개 RSS 피드, 연결 상태 직접 확인 완료)
 
 | 소스 | URL | 확인 결과 |
 |---|---|---|
 | 베리타스알파 · 대입/대학/고입/고교/교육 섹션 (5개 피드) | `veritas-a.com/rss/S1N2~S1N6.xml` | HTTP 200 (전부). 전체기사(`allArticle.xml`)만 쓰다가, RSS가 최신 50건만 유지해 무관 기사에 밀려나는 문제를 발견하고, 사이트 실제 내비게이션의 섹션 코드(`sc_section_code`)를 확인해 관련 섹션만 개별 수집하는 방식으로 전환. 입학사정관은 지원자 출신 고교 특성도 파악해야 하므로 고입·고교 섹션도 포함. URL 기준 중복 제거로 겹치는 기사는 한 번만 집계됨 |
 | 에듀동아 | `https://edu.donga.com/rss/allArticle.xml` | HTTP 200, `application/xml` |
+| 에듀진 | `https://www.edujin.co.kr/rss/allArticle.xml` | HTTP 200, `application/xml`. 입시 전문지라 전체기사 자체가 학생부종합전형·논술·수시 콘텐츠 위주. 섹션별 피드는 같은 CMS 벤더(ND소프트)의 타사 데모 데이터 혼입/403 에러로 미사용 |
 | 한국대학신문(UNN) | `https://news.unn.net/rss/allArticle.xml` | HTTP 200, `application/xml` |
 | 한국교육개발원(KEDI) 보도자료 | `https://www.kedi.re.kr/khome/main/announce/rssAnnounceData.do?board_sq_no=3` | HTTP 200, `text/xml`. 내용 확인: "2026년 교육기본통계 조사 결과 발표", "N수생의 특성 분석: 입시 결과 및 대학 경험" 등 — 교육부 산하 국책연구기관의 정책·통계 보도자료로, 공식 발표에 가장 근접한 실제 작동 소스 |
 | 서울특별시교육청 | `https://enews.sen.go.kr/rss.do` | HTTP 200, `application/rss+xml`. 전체기사 42,626건 누적, 표준 RSS 2.0. 16개 시도교육청 중 직접 확인·교차검증(유사 오픈소스 `j-k-park/edu-news`)으로 유일하게 공식 RSS가 있는 곳. 단, `pubDate`가 시각 없이 날짜만 제공돼(`2026-09-14`) `published_at()`에 KST 보정 로직을 추가함 — 날짜만 있을 때 그날 자정이 아니라 "그날이 끝나는 시각(23:59:59 KST)"으로 해석해야 24시간 컷오프 경계에서 부당하게 제외되지 않는다 |
@@ -44,7 +45,7 @@
 | 커리어넷 드림레터 | `career.go.kr/cnet/common/service/dreamLetter.rss` | HTTP 500, 홈페이지로 리다이렉트됨 — 현재 URL이 깨져 있음 |
 | 서울 외 15개 시도교육청 (부산·대구·인천·대전·울산·세종·경기·강원·충북·충남·전북·경북·경남·전남·광주·제주) | 각 공식 사이트 | 서브도메인 패턴(`news.xxx.go.kr` 등) 추측 시도 전부 연결 실패(DNS/연결 자체 안 됨). 유사 오픈소스 프로젝트(`j-k-park/edu-news`)도 이 15곳은 `board: null`로 남기고 구글 뉴스 검색 RSS로 대체 중임을 교차 확인 — 공식 RSS 부재로 판단 |
 
-→ **결론: 공식 발표(교육부·대교협·KICE) 소스는 이번 제출 범위에서 제외**하고, 전문 매체 3개(베리타스알파 5개 섹션 피드 포함) + KEDI 보도자료 1개(정책·통계 콘텐츠로 공식 발표에 가장 근접) + 서울특별시교육청 1개(16개 시도교육청 중 유일한 공식 RSS) 총 5개 기관·매체(9개 피드)로 MVP를 구성한다. MOE/KICE는 목록이 JS로 렌더링되는 구조라 `requests`만으로 수집이 불가능해 브라우저 기반 정찰이 필요하며, 이는 §11 스트레치 목표로 남긴다.
+→ **결론: 공식 발표(교육부·대교협·KICE) 소스는 이번 제출 범위에서 제외**하고, 전문 매체 4개(베리타스알파 5개 섹션 피드 포함) + KEDI 보도자료 1개(정책·통계 콘텐츠로 공식 발표에 가장 근접) + 서울특별시교육청 1개(16개 시도교육청 중 유일한 공식 RSS) 총 6개 기관·매체(10개 피드)로 MVP를 구성한다. MOE/KICE는 목록이 JS로 렌더링되는 구조라 `requests`만으로 수집이 불가능해 브라우저 기반 정찰이 필요하며, 이는 §11 스트레치 목표로 남긴다.
 
 ## 4. 자료 선별 — 기준
 
@@ -144,7 +145,7 @@
 
 ```mermaid
 graph LR
-  START --> collect["① collect\n(RSS 9개 피드, 5개 기관)"]
+  START --> collect["① collect\n(RSS 10개 피드, 6개 기관)"]
   collect --> select["② select\n(예선 8건→본선 5건)"]
   select -->|Send fan-out| report["③ report\n(기사별 병렬 워커)"]
   report --> verify["④ verify\n(원문 대비 근거 확인)"]
@@ -168,7 +169,7 @@ State(`Brief` TypedDict), 노드 5개, 엣지 구조 모두 기존과 동일. `s
 
 ## 12. 완료 기준 (Acceptance Criteria)
 
-- AC1: `graph.py`의 `SOURCES`가 §3.1의 9개 RSS 피드(5개 기관·매체)로 교체되고, 실제 실행 시 정상 수집되며 중복 기사가 두 번 집계되지 않음
+- AC1: `graph.py`의 `SOURCES`가 §3.1의 10개 RSS 피드(6개 기관·매체)로 교체되고, 실제 실행 시 정상 수집되며 중복 기사가 두 번 집계되지 않음
 - AC2: `audience.yaml`이 존재하고 `CRITERIA`/`SYS`가 이 파일에서 조립됨 (코드에 하드코딩된 도메인 문자열 없음)
 - AC3: `Draft.topic`이 §5의 6개 값으로 교체됨
 - AC4: `publish()`가 Google Chat 웹훅으로 전송하며, `DRY_RUN=1`일 때 콘솔에 메시지 미리보기가 출력됨

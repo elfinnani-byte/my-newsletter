@@ -33,6 +33,7 @@ SOURCES = [
     ("베리타스알파",    "https://www.veritas-a.com/rss/S1N5.xml"),   # 고교
     ("베리타스알파",    "https://www.veritas-a.com/rss/S1N6.xml"),   # 교육
     ("에듀동아",        "https://edu.donga.com/rss/allArticle.xml"),
+    ("에듀진",          "https://www.edujin.co.kr/rss/allArticle.xml"),
     ("한국대학신문",    "https://news.unn.net/rss/allArticle.xml"),
     ("KEDI",            "https://www.kedi.re.kr/khome/main/announce/rssAnnounceData.do?board_sq_no=3"),
     ("서울시교육청",    "https://enews.sen.go.kr/rss.do"),
