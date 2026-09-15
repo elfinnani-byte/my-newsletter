@@ -193,42 +193,28 @@ def verify(s: dict) -> dict:                  # ④ 검수 — 빈 노드를 갈
             "log": [f"④ 검수   {len(s['drafted'])} → {len(kept)}건"
                     + (f" · 불합격 {[x['source'] for x in dropped]}" if dropped else "")]}
 
-COLORS = {"모델·API": 0x0B6E77, "도구·프레임워크": 0x4C7C9C,
-          "정책·규제": 0x8F5606, "사례·적용": 0x2E7D5B, "연구": 0x6A4A9C}
-DEFAULT = 0x5F7476
-TITLE_MAX, DESC_MAX, EMBED_MAX, TOTAL_MAX = 256, 4096, 10, 5800   # 6000에서 여유를 둔다
-
-def build_embeds(run_id, lead, articles):
-    if not articles:                                   # 조용한 날에도 한 장은 보낸다
-        return [{"title": f"🗞️ {run_id}", "color": DEFAULT,
-                 "description": "오늘은 조용합니다."}]
-    embeds = [{"title": f"🗞️ {run_id} · AI 브리핑", "description": lead, "color": DEFAULT}]
+def build_gchat_text(run_id, lead, articles):
+    if not articles:                                   # 조용한 날에도 한 줄은 보낸다
+        return f"*🗞️ {run_id}*\n오늘은 조용합니다."
+    parts = [f"*🗞️ {run_id} · 대입·교육정책 브리핑*"]
+    if lead:
+        parts.append(lead)
     for i, a in enumerate(articles, 1):
-        desc = a["summary"]
+        block = [f"*{i}. {a['headline']}*", a["summary"]]
         if a.get("why"):
-            desc += f"\n\n💡 **{a['why']}**"
-        embeds.append({
-            "title":       f"{i}. {a['headline']}"[:TITLE_MAX],
-            "description": desc[:DESC_MAX],
-            "url":         a["url"],
-            "color":       COLORS.get(a.get("topic", ""), DEFAULT),
-            "footer":      {"text": f"{a['source']} · {a['when']}"},
-        })
-    total = lambda es: sum(len(e.get("title", "")) + len(e.get("description", ""))
-                           + len(e.get("footer", {}).get("text", "")) for e in es)
-    while len(embeds) > EMBED_MAX or total(embeds) > TOTAL_MAX:
-        embeds.pop()
-    return embeds
+            block.append(f"💡 {a['why']}")
+        block.append(f"<{a['url']}|원문 보기> · {a['source']} · {a['when']}")
+        parts.append("\n".join(block))
+    return "\n\n".join(parts)
 
 def send(run_id, lead, articles, webhook=None, dry_run=True):
-    payload = {"username": "최주희 · AI 뉴스봇", "embeds": build_embeds(run_id, lead, articles)}
+    text = build_gchat_text(run_id, lead, articles)
     if dry_run or not webhook:
-        print(f"[dry-run] embed {len(payload['embeds'])}개 · "
-              f"{len(json.dumps(payload, ensure_ascii=False))}자 — 보내지 않음")
-        print(json.dumps(payload["embeds"][-1], ensure_ascii=False, indent=2)[:400])
+        print(f"[dry-run] 메시지 {len(text)}자 — 보내지 않음")
+        print(text[:400])
         return False
-    r = requests.post(webhook, json=payload, timeout=20)
-    ok = r.status_code in (200, 204)
+    r = requests.post(webhook, json={"text": text}, timeout=20)
+    ok = r.status_code == 200
     print("발행:", "성공" if ok else f"실패 {r.status_code} {r.text[:120]}")
     return ok
 
@@ -248,7 +234,7 @@ def publish(s: dict) -> dict:                 # ⑤ 발행 — 마지막 빈 노
              "when": a["at"].strftime("%m-%d %H:%M")} for a in s["verified"]]
     today = datetime.now().strftime("%Y-%m-%d")
     sent  = send(today, make_lead(arts, s.get("dead")), arts,
-                 webhook=os.environ.get("DISCORD_WEBHOOK_URL"),
+                 webhook=os.environ.get("GCHAT_WEBHOOK_URL"),
                  dry_run=os.environ.get("DRY_RUN", "1") == "1")   # 기본은 보내지 않음
     label = f"{len(arts)}건" if arts else "조용합니다"
     return {"log": [f"⑤ 발행   {label} · {'보냄' if sent else 'dry-run'}"]}
