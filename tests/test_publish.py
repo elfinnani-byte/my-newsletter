@@ -35,7 +35,7 @@ def test_build_gchat_text_shows_topic_emoji_on_headline_and_topic_name_in_footer
     }]
     text = build_gchat_text("2026-09-15", "", articles)
     assert "*1. 📋 테스트 헤드라인*" in text
-    assert "<https://example.com/a|원문 보기> · 테스트소스 · 09-15 09:00 · 입시제도·정책" in text
+    assert "<https://example.com/a|원문 보기> · 입시제도·정책 · 테스트소스 · 09-15 09:00" in text
 
 
 def test_build_gchat_text_unknown_topic_uses_default_emoji():

@@ -205,7 +205,7 @@ def build_gchat_text(run_id, lead, articles):
         block = [f"*{i}. {emoji} {a['headline']}*", a["summary"]]
         if a.get("why"):
             block.append(f"💡 {a['why']}")
-        block.append(f"<{a['url']}|원문 보기> · {a['source']} · {a['when']} · {a.get('topic', '')}")
+        block.append(f"<{a['url']}|원문 보기> · {a.get('topic', '')} · {a['source']} · {a['when']}")
         parts.append("\n".join(block))
     return "\n\n".join(parts)
 
