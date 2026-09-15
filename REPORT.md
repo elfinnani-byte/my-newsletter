@@ -14,6 +14,8 @@
 | 에듀동아 | `https://edu.donga.com/rss/allArticle.xml` | HTTP 200 | 채택 | 표준 RSS 2.0 |
 | 한국대학신문(UNN) | `https://news.unn.net/rss/allArticle.xml` | HTTP 200 | 채택 | 표준 RSS 2.0, 대학 소식 전문지 |
 | 한국교육개발원(KEDI) 보도자료 | `https://www.kedi.re.kr/khome/main/announce/rssAnnounceData.do?board_sq_no=3` | HTTP 200 | 채택 | 교육부 산하 국책연구기관의 정책·통계 발표. 공식 발표에 가장 근접한 실사용 가능 소스 |
+| 서울특별시교육청 | `https://enews.sen.go.kr/rss.do` | HTTP 200 | 채택 | 16개 시도교육청 중 유일하게 확인된 공식 RSS(전체기사, 42,626건 누적). 날짜만 있고 시각이 없는 `pubDate` 형식이라 수집 로직에 KST 보정을 추가함(§3 참고) |
+| 나머지 15개 시도교육청(부산·대구·인천·대전·울산·세종·경기·강원·충북·충남·전북·경북·경남·전남·광주·제주) | 각 공식 사이트 | RSS 없음 | 탈락 | 서브도메인 패턴 추측 시도 전부 연결 실패. 유사 오픈소스 프로젝트(`j-k-park/edu-news`)도 이 15곳은 전부 공식 RSS를 못 찾아 구글 뉴스 검색으로 대체하고 있음을 교차 확인 |
 | 교육부 보도자료 | `moe.go.kr/boardCnts/list.do?boardID=294...` | RSS 없음 | 탈락 | 목록이 JS로 렌더링되어 `requests`로 수집 불가 |
 | 한국대학교육협의회(대교협) | 공식 사이트 | RSS 없음 | 탈락 | RSS 링크 미발견 |
 | korea.kr 정책브리핑 | `korea.kr/rss/dept_A00002.xml` 등 | 404 | 탈락 | 부처별 RSS가 체크박스 커스텀 생성 방식으로 추정, 정적 URL 확인 실패 |
@@ -23,7 +25,7 @@
 | KOSIS 최근수록자료 | `kosis.kr/rss/themes_rss.jsp` | HTTP 200 | 탈락 | 전국 전분야 통계가 섞여 노이즈가 큼 (교육 카테고리 미필터) |
 | 커리어넷 드림레터 | `career.go.kr/.../dreamLetter.rss` | HTTP 500 | 탈락 | URL이 깨져 있음 |
 
-최종 채택: 4개 소스 (베리타스알파, 에듀동아, 한국대학신문, KEDI 보도자료).
+최종 채택: 5개 소스 (베리타스알파, 에듀동아, 한국대학신문, KEDI 보도자료, 서울특별시교육청).
 
 ## 3. 선별 로직 설계
 
@@ -42,7 +44,7 @@
 
 ```mermaid
 graph LR
-  START --> collect["① collect\n(RSS 4개 소스)"]
+  START --> collect["① collect\n(RSS 5개 소스)"]
   collect --> select["② select\n(예선 8건→본선 5건)"]
   select -->|Send fan-out| report["③ report\n(기사별 병렬 워커)"]
   report --> verify["④ verify\n(원문 대비 근거 확인)"]
