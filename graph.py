@@ -27,8 +27,11 @@ class Brief(TypedDict):
 
 UA = {"User-Agent": "Mozilla/5.0 (newsletter-agent-course)"}
 SOURCES = [
-    ("베리타스알파",    "https://www.veritas-a.com/rss/S1N2.xml"),
-    ("베리타스알파",    "https://www.veritas-a.com/rss/allArticle.xml"),
+    ("베리타스알파",    "https://www.veritas-a.com/rss/S1N2.xml"),   # 대입
+    ("베리타스알파",    "https://www.veritas-a.com/rss/S1N3.xml"),   # 대학
+    ("베리타스알파",    "https://www.veritas-a.com/rss/S1N4.xml"),   # 고입
+    ("베리타스알파",    "https://www.veritas-a.com/rss/S1N5.xml"),   # 고교
+    ("베리타스알파",    "https://www.veritas-a.com/rss/S1N6.xml"),   # 교육
     ("에듀동아",        "https://edu.donga.com/rss/allArticle.xml"),
     ("한국대학신문",    "https://news.unn.net/rss/allArticle.xml"),
     ("KEDI",            "https://www.kedi.re.kr/khome/main/announce/rssAnnounceData.do?board_sq_no=3"),
