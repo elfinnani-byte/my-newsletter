@@ -153,7 +153,7 @@ graph LR
   publish --> END
 ```
 
-State(`Brief` TypedDict), 노드 5개, 엣지 구조 모두 기존과 동일. `select`의 `fan_report`(Send를 통한 팬아웃)도 그대로.
+State(`Brief` TypedDict), 노드 5개, 엣지 구조 모두 기존과 동일. `select`의 `fan_report`(Send를 통한 팬아웃)도 그대로. 다만 그래프 실행 시 `invoke(INIT, config={"recursion_limit": 15})`로 재귀 한도를 명시적으로 거는 것을 추가했다 — 지금 구조는 순환이 없어 실제로 걸릴 일은 없지만, 나중에 재시도 루프가 추가될 경우를 대비한 안전장치다.
 
 ## 10. 비목표 (Non-goals)
 

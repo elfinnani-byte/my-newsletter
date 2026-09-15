@@ -314,7 +314,9 @@ def append_metrics_row(row: dict, path: pathlib.Path = pathlib.Path("store/metri
 
 
 def run():                                     # 돌리고, 한 줄 남긴다
-    out = build().compile().invoke(INIT)
+    # 지금 그래프는 순환 없이 선형(+팬아웃 한 번)이라 실제로 재귀 한도에 걸릴 일은 없지만,
+    # 나중에 재시도 루프 등을 추가했을 때 폭주를 막는 안전장치로 명시적으로 한도를 건다.
+    out = build().compile().invoke(INIT, config={"recursion_limit": 15})
     row = {"run_id":    datetime.now().strftime("%Y-%m-%d %H:%M"),
            "collected": len(out["collected"]),
            "picked":    len(out["picked"]),
