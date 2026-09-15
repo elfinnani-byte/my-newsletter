@@ -1,6 +1,6 @@
 import pathlib
 import pytest
-from config import load_audience, build_criteria, topic_names, build_topic_guide
+from config import load_audience, build_criteria, topic_names, build_topic_guide, topic_emoji_map
 
 
 def test_load_audience_missing_file_raises(tmp_path):
@@ -44,3 +44,16 @@ def test_build_topic_guide_lists_every_topic_with_guidance():
     guide = build_topic_guide(cfg)
     assert "A" in guide
     assert "가이드A" in guide
+
+
+def test_topic_emoji_map_returns_emoji_per_topic():
+    cfg = {"토픽": [{"이름": "A", "데스크지침": "a", "이모지": "📋"},
+                    {"이름": "B", "데스크지침": "b", "이모지": "🎓"}]}
+    emap = topic_emoji_map(cfg)
+    assert emap == {"A": "📋", "B": "🎓"}
+
+
+def test_topic_emoji_map_defaults_when_missing():
+    cfg = {"토픽": [{"이름": "A", "데스크지침": "a"}]}
+    emap = topic_emoji_map(cfg)
+    assert emap["A"] == "📰"

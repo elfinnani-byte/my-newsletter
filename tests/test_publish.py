@@ -23,6 +23,30 @@ def test_build_gchat_text_includes_headline_and_link():
     assert "오늘은 1건입니다." in text
 
 
+def test_build_gchat_text_shows_topic_emoji_on_headline_and_topic_name_in_footer():
+    articles = [{
+        "headline": "테스트 헤드라인",
+        "summary": "테스트 요약입니다.",
+        "why": "테스트 이유입니다.",
+        "url": "https://example.com/a",
+        "source": "테스트소스",
+        "topic": "입시제도·정책",
+        "when": "09-15 09:00",
+    }]
+    text = build_gchat_text("2026-09-15", "", articles)
+    assert "*1. 📋 테스트 헤드라인*" in text
+    assert "<https://example.com/a|원문 보기> · 테스트소스 · 09-15 09:00 · 입시제도·정책" in text
+
+
+def test_build_gchat_text_unknown_topic_uses_default_emoji():
+    articles = [{
+        "headline": "제목", "summary": "요약", "why": "이유",
+        "url": "https://example.com/b", "source": "소스", "topic": "미등록토픽", "when": "09-15 09:00",
+    }]
+    text = build_gchat_text("2026-09-15", "", articles)
+    assert "*1. 📰 제목*" in text
+
+
 def test_build_gchat_text_numbers_multiple_articles():
     articles = [
         {"headline": "첫번째", "summary": "s1", "why": "w1",
@@ -31,5 +55,5 @@ def test_build_gchat_text_numbers_multiple_articles():
          "url": "https://example.com/2", "source": "B", "topic": "대학 소식", "when": "09-15 09:10"},
     ]
     text = build_gchat_text("2026-09-15", "", articles)
-    assert "*1. 첫번째*" in text
-    assert "*2. 두번째*" in text
+    assert "*1. 🏛️ 첫번째*" in text
+    assert "*2. 🏛️ 두번째*" in text

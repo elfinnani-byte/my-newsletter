@@ -68,11 +68,12 @@ def collect(s: dict) -> dict:   # ① 자료 수집 — 빈 노드를 갈아 끼
 
 client = OpenAI()
 
-from config import load_audience, build_criteria, topic_names, build_topic_guide
+from config import load_audience, build_criteria, topic_names, build_topic_guide, topic_emoji_map
 
 CFG = load_audience()
 TOPIC_NAMES = topic_names(CFG)
 TOPIC_GUIDE = build_topic_guide(CFG)
+TOPIC_EMOJI = topic_emoji_map(CFG)
 
 class Pick(BaseModel):
     index: int = Field(description="후보 목록에서의 번호")
@@ -200,10 +201,11 @@ def build_gchat_text(run_id, lead, articles):
     if lead:
         parts.append(lead)
     for i, a in enumerate(articles, 1):
-        block = [f"*{i}. {a['headline']}*", a["summary"]]
+        emoji = TOPIC_EMOJI.get(a.get("topic", ""), "📰")
+        block = [f"*{i}. {emoji} {a['headline']}*", a["summary"]]
         if a.get("why"):
             block.append(f"💡 {a['why']}")
-        block.append(f"<{a['url']}|원문 보기> · {a['source']} · {a['when']}")
+        block.append(f"<{a['url']}|원문 보기> · {a['source']} · {a['when']} · {a.get('topic', '')}")
         parts.append("\n".join(block))
     return "\n\n".join(parts)
 

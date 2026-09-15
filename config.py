@@ -32,3 +32,7 @@ def build_topic_guide(cfg: dict) -> str:
     lines = ["토픽별 작성 지침:"]
     lines += [f"- {t['이름']}: {t['데스크지침']}" for t in cfg["토픽"]]
     return "\n".join(lines)
+
+
+def topic_emoji_map(cfg: dict) -> dict:
+    return {t["이름"]: t.get("이모지", "📰") for t in cfg["토픽"]}
