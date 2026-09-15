@@ -28,7 +28,7 @@
 | 한국교육개발원(KEDI) 보도자료 | `https://www.kedi.re.kr/khome/main/announce/rssAnnounceData.do?board_sq_no=3` | HTTP 200, `text/xml`. 내용 확인: "2026년 교육기본통계 조사 결과 발표", "N수생의 특성 분석: 입시 결과 및 대학 경험" 등 — 교육부 산하 국책연구기관의 정책·통계 보도자료로, 공식 발표에 가장 근접한 실제 작동 소스 |
 | 서울특별시교육청 | `https://enews.sen.go.kr/rss.do` | HTTP 200, `application/rss+xml`. 전체기사 42,626건 누적, 표준 RSS 2.0. 16개 시도교육청 중 직접 확인·교차검증(유사 오픈소스 `j-k-park/edu-news`)으로 유일하게 공식 RSS가 있는 곳. 단, `pubDate`가 시각 없이 날짜만 제공돼(`2026-09-14`) `published_at()`에 KST 보정 로직을 추가함 — 날짜만 있을 때 그날 자정이 아니라 "그날이 끝나는 시각(23:59:59 KST)"으로 해석해야 24시간 컷오프 경계에서 부당하게 제외되지 않는다 |
 
-모든 피드가 `feedparser`로 바로 파싱 가능한 표준 RSS 2.0이며, 기존 `collect()` 함수의 `SOURCES` 리스트 형식(`(이름, url)` 튜플)을 그대로 사용할 수 있다. 베리타스알파만 같은 이름으로 URL이 다른 두 항목(대입 섹션, 전체기사)을 등록했고, `collect()`가 기사 URL 기준으로 중복을 제거하므로 겹치는 기사가 두 번 집계되지 않는다.
+모든 피드가 `feedparser`로 바로 파싱 가능한 표준 RSS 2.0이며, 기존 `collect()` 함수의 `SOURCES` 리스트 형식(`(이름, url)` 튜플)을 그대로 사용할 수 있다. 베리타스알파만 같은 이름으로 URL이 다른 다섯 항목(대입·대학·고입·고교·교육 섹션)을 등록했고, `collect()`가 기사 URL 기준으로 중복을 제거하므로 겹치는 기사가 두 번 집계되지 않는다.
 
 ### 3.2 검토 후 탈락한 소스 (REPORT.md 소스채택표용 근거)
 
@@ -90,7 +90,7 @@
 기존 `publish()`/`send()`/`build_embeds()` (Discord 웹훅 + embed) 를 Google Chat 웹훅으로 교체한다.
 
 - 방식: Incoming Webhook URL에 `POST`, `Content-Type: application/json`, 바디는 단순 텍스트 (`{"text": "..."}`) — Discord의 embed(제목·색상·필드 배열)에 대응하는 리치 카드(Cards v2)는 이번 범위에서 사용하지 않는다. 이유: 리치 카드 스키마는 Discord embed와 호환되지 않아 별도 매핑이 필요하고, 단순 텍스트로도 다섯 개 기사(헤드라인·요약·이유·링크)를 충분히 전달할 수 있다 (YAGNI).
-- 텍스트 포맷: Google Chat은 `*굵게*`, `_기울임_`, `<url|텍스트>` 링크 문법을 지원 (Slack mrkdwn과 유사하지만 별도 문법) — 기사별로 `*{i}. {headline}*\n{summary}\n💡 {why}\n<{url}|원문 보기>` 형태로 조립
+- 텍스트 포맷: Google Chat은 `*굵게*`, `_기울임_`, `<url|텍스트>` 링크 문법을 지원 (Slack mrkdwn과 유사하지만 별도 문법) — 기사별로 `*{i}. {토픽이모지} {headline}*\n{summary}\n💡 {why}\n<{url}|원문 보기> · {topic} · {source} · {when}` 형태로 조립. 토픽별 이모지(📋🎓📊🏫📈🏛️)는 `audience.yaml`의 `토픽[].이모지`에서 가져오며, Discord의 embed color(사이드바 색상 줄)에 대응하는 시각적 구분을 텍스트 메시지 안에서 이모지로 대체한 것 — Google Chat 텍스트 메시지는 색상 자체를 지원하지 않음을 확인함
 - 환경변수: `DISCORD_WEBHOOK_URL` → `GCHAT_WEBHOOK_URL`로 이름 변경. `DRY_RUN` 기본값(1=발행 안 함) 로직은 그대로 유지
 - `.github/workflows/daily.yml`의 secrets 참조도 `GCHAT_WEBHOOK_URL`로 변경
 
@@ -144,8 +144,8 @@
 
 ```mermaid
 graph LR
-  START --> collect["① collect\n(RSS 5개 소스)"]
-  collect --> select["② select\n(예선 8건→본선 target건)"]
+  START --> collect["① collect\n(RSS 9개 피드, 5개 기관)"]
+  collect --> select["② select\n(예선 8건→본선 5건)"]
   select -->|Send fan-out| report["③ report\n(기사별 병렬 워커)"]
   report --> verify["④ verify\n(원문 대비 근거 확인)"]
   verify --> publish["⑤ publish\n(Google Chat webhook)"]
@@ -159,7 +159,7 @@ State(`Brief` TypedDict), 노드 5개, 엣지 구조 모두 기존과 동일. `s
 - 교육부/KICE 공식 발표 스크래핑 (§3.2, §11에서 스트레치 목표로 분리)
 - Slack, 텔레그램, 이메일 등 다른 채널 동시 지원 (Google Chat 1채널만 이번 범위)
 - `audience.yaml`의 pydantic 스키마 검증 (강의의 "더 해보기" 항목, 스트레치 목표)
-- 실제 발행 자동 실행 (설계·구현 단계에서는 `DRY_RUN=1` 유지, 실제 발행은 사용자가 별도로 검증 후 결정)
+- 실제 발행 자동 실행 (설계·구현 단계에서는 `DRY_RUN=1` 유지, 실제 발행은 사용자가 별도로 검증 후 결정 — 이후 구현이 끝난 뒤 사용자 승인을 받아 수동으로 여러 차례 실제 발행해 정상 동작을 확인함. "자동" 실행(cron)을 막는다는 의미였지, 수동 실제 발행 자체를 막는 것은 아니었음)
 
 ## 11. 스트레치 목표 (향후 과제)
 
@@ -168,7 +168,7 @@ State(`Brief` TypedDict), 노드 5개, 엣지 구조 모두 기존과 동일. `s
 
 ## 12. 완료 기준 (Acceptance Criteria)
 
-- AC1: `graph.py`의 `SOURCES`가 §3.1의 6개 RSS 피드(5개 기관·매체)로 교체되고, 실제 실행 시 정상 수집되며 중복 기사가 두 번 집계되지 않음
+- AC1: `graph.py`의 `SOURCES`가 §3.1의 9개 RSS 피드(5개 기관·매체)로 교체되고, 실제 실행 시 정상 수집되며 중복 기사가 두 번 집계되지 않음
 - AC2: `audience.yaml`이 존재하고 `CRITERIA`/`SYS`가 이 파일에서 조립됨 (코드에 하드코딩된 도메인 문자열 없음)
 - AC3: `Draft.topic`이 §5의 6개 값으로 교체됨
 - AC4: `publish()`가 Google Chat 웹훅으로 전송하며, `DRY_RUN=1`일 때 콘솔에 메시지 미리보기가 출력됨
