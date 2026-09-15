@@ -3,7 +3,7 @@ from collections import Counter
 from graph import SOURCES
 
 path = pathlib.Path("store/metrics.jsonl")
-rows = [json.loads(l) for l in path.read_text().splitlines() if l.strip()] \
+rows = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()] \
        if path.exists() else []
 
 if not rows:
@@ -15,7 +15,8 @@ else:
         pub.update(r["by_source"])
     print(f"{'소스':<12}{'발행 기여':>9}")
     print("-" * 23)
-    for name, _ in SOURCES:
+    names = dict.fromkeys(name for name, _ in SOURCES)   # 같은 이름(예: 베리타스알파의 5개 피드)은 한 번만
+    for name in names:
         print(f"{name:<12}{pub.get(name, 0):>9}")
 
     print("\n수집 → 선별 → 취재 → 발행")

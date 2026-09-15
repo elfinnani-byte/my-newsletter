@@ -304,6 +304,15 @@ INIT = {"hours": 24,
          "collected": [], "dead": [], "picked": [], "drafted": [], "verified": [], "log": []}
 
 
+def append_metrics_row(row: dict, path: pathlib.Path = pathlib.Path("store/metrics.jsonl")) -> None:
+    # encoding="utf-8"을 반드시 명시한다 — 안 그러면 OS 기본 인코딩(윈도우 cp949 등)으로
+    # 써져서, 다른 환경(예: UTF-8이 기본인 Linux GitHub Actions)이 이어서 같은 파일에
+    # 쓰면 인코딩이 섞여 깨진다.
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
 def run():                                     # 돌리고, 한 줄 남긴다
     out = build().compile().invoke(INIT)
     row = {"run_id":    datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -316,8 +325,5 @@ def run():                                     # 돌리고, 한 줄 남긴다
            "log":       out["log"]}
     for a in out["verified"]:
         row["by_source"][a["source"]] = row["by_source"].get(a["source"], 0) + 1
-    path = pathlib.Path("store/metrics.jsonl")
-    path.parent.mkdir(exist_ok=True)
-    with path.open("a") as f:
-        f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    append_metrics_row(row)
     return out
